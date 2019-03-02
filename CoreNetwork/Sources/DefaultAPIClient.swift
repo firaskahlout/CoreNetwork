@@ -16,7 +16,7 @@ public final class DefaultAPIClient: APIClient {
       self.configuration = configuration
    }
    
-   public func execute<T: APIRequest>(_ request: T, completion: @escaping Handler<T.Response>) {
+   public func execute<Request: APIRequest, Response: Decodable>(_ request: Request, completion: @escaping Handler<Response>) {
       
       let urlRequest = request.urlRequest(in: self)
       
@@ -34,7 +34,7 @@ public final class DefaultAPIClient: APIClient {
             completion(.failure(NetworkError.error(error.localizedDescription)))
          } else if let data = response.data {
             do {
-               let object = try JSONDecoder().decode(T.Response.self, from: data)
+               let object = try JSONDecoder().decode(Response.self, from: data)
                completion(.success(object))
             } catch {
                completion(.failure(NetworkError.decodingFailed))
